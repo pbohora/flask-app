@@ -3,6 +3,7 @@ from flask_restful import Resource, Api, reqparse
 from flask_jwt import JWT, jwt_required, current_identity
 
 from auth import authenticate, identity
+from user import UserRegister
 
 import config
 
@@ -66,6 +67,7 @@ class Item(Resource):                             #create resource Item
 
 api.add_resource(ItemList, "/items")
 api.add_resource(Item, "/item/<string:name>")
+api.add_resource(UserRegister, "/signup")
 
 if __name__ == "__main__":
     app.run(port=3000, debug = True)
