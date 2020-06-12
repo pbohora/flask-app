@@ -12,7 +12,7 @@ class User:
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
 
-        query = "SELECT * FROM users WHERE username = ?"
+        query = "SELECT * FROM users WHERE username=?"
         result = cursor.execute(query, (username,))
         row = result.fetchone()
 
@@ -60,6 +60,9 @@ class UserRegister(Resource):
 
     def post(self):
         data = UserRegister.parser.parse_args()
+        
+        if User.find_by_username(data["username"]):
+            return {"message": "User already exists with that username"}, 400
 
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
