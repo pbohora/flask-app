@@ -25,6 +25,40 @@ class ItemObj:
 
         return item
 
+    @classmethod
+    def insert(cls, item):
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+        
+        query = "INSERT INTO items VALUES(?,?)"
+        cursor.execute(query, (item["name"], item["price"]))
+
+        connection.commit()
+        connection.close()
+
+    @classmethod
+    def update(cls, item):
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+        
+        query = "UPDATE items SET price=? where name=?"
+        cursor.execute(query, (item["price"], item["name"]))
+
+        connection.commit()
+        connection.close()
+
+    @classmethod
+    def remove(cls,name):
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+        
+        query = "DELETE FROM items where name = ?"
+        cursor.execute(query, (name,))
+
+        connection.commit()
+        connection.close()
+
+
 class ItemList(Resource):
     def get(self):
         return {"items": items}, 200
@@ -40,8 +74,11 @@ class Item(Resource):                             #create resource Item
     )
 
     def get(self, name):
-        item = ItemObj.find_by_name(name)
-        print(item)
+        try:
+            item = ItemObj.find_by_name(name)
+        except:
+            return {"message":"Error occur while getting an item"}, 500
+        
         if item:
             return {"item":item.name,"price":item.price}          
        
@@ -55,34 +92,40 @@ class Item(Resource):                             #create resource Item
         
         data = Item.parser.parse_args()
 
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
-        
-        newItem = {"name":name,"price":data["price"]}
-        query = "INSERT INTO items VALUES(?,?)"
-        cursor.execute(query, (name, data["price"]))
+        new_item = {"name":name,"price":data["price"]}
 
-        connection.commit()
-        connection.close()
+        try:
+            ItemObj.insert(new_item)
+        except:
+            return{"message":"Error occur while inserting an item"}, 500
 
         return newItem, 201
 
     @jwt_required()
     def delete(self, name):
-        global items
-        items = list(filter(lambda x: x["name"] != name, items))
+        try:
+            ItemObj.remove(name)
+        except:
+            return{"message":"Error occur while removing an item"}, 500
+        
         return {"message":f"Item {name} deleted"}, 204
 
     @jwt_required()
     def put(self, name): 
-        data = Item.parser.parser()
+        data = Item.parser.parse_args()
 
-        item = next(filter(lambda x : x["name"] == name, items), None)
+        item = ItemObj.find_by_name(name)
+        updated_item = {"name":name, "price":data["price"]}
 
-        if items is None: 
-            newItem = {"name":name, "price": data["price"]}
-            items.append(newItem)
+        if item is None: 
+            try:
+                ItemObj.insert(updated_item)
+            except:
+                return{"message":"Error occur while inserting an item"}, 500            
         else:
-            item.update(data)
+            try:
+                ItemObj.update(updated_item)
+            except:
+                return{"message":"Error occur while updating an item"}, 500
 
-        return item
+        return updated_item

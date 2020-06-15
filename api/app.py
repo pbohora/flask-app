@@ -17,7 +17,7 @@ jwt = JWT(app, authenticate, identity)          #JWT creates a new end point /au
 
 api.add_resource(ItemList, "/items")
 api.add_resource(Item, "/item/<string:name>")
-api.add_resource(UserRegister, "/")
+api.add_resource(UserRegister, "/signup")
 
 if __name__ == "__main__":
     app.run(port=3000, debug = True)
