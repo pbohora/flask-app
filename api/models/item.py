@@ -1,6 +1,13 @@
 import sqlite3
+from db import db
 
-class ItemModel:
+class ItemModel(db.Model):
+    __tablename__ = "items"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80))
+    price = db.Column(db.Float(precision=2))
+
     def __init__(self, name, price):
         self.name = name
         self.price = price 
@@ -10,48 +17,59 @@ class ItemModel:
 
     @classmethod
     def find_by_name(cls, name):
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
+        return cls.query.filter_by(name=name).first()  # SELECT * FROM items WHERE name= name LIMIT 1
 
-        query = "SELECT * FROM items WHERE name=?"
-        result = cursor.execute(query, (name,))
-        row = result.fetchone()
+        # connection = sqlite3.connect("data.db")
+        # cursor = connection.cursor()
 
-        if row:
-            item = cls(*row)
-        else:
-            item = None
+        # query = "SELECT * FROM items WHERE name=?"
+        # result = cursor.execute(query, (name,))
+        # row = result.fetchone()
+
+        # if row:
+        #     item = cls(*row)
+        # else:
+        #     item = None
         
-        connection.close()
+        # connection.close()
 
-        return item
+        # return item
 
-    def insert(self):
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+        # connection = sqlite3.connect("data.db")
+        # cursor = connection.cursor()
         
-        query = "INSERT INTO items VALUES(?,?)"
-        cursor.execute(query, (self.name, self.price))
+        # query = "INSERT INTO items VALUES(?,?)"
+        # cursor.execute(query, (self.name, self.price))
 
-        connection.commit()
-        connection.close()
+        # connection.commit()
+        # connection.close()
 
-    def update(self):
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
+    # sqlAlchemy do update with the method above if it finds item in db otherwise save new item
+
+    # def update(self):
+    #     connection = sqlite3.connect("data.db")
+    #     cursor = connection.cursor()
         
-        query = "UPDATE items SET price=? where name=?"
-        cursor.execute(query, (self.price, self.name))
+    #     query = "UPDATE items SET price=? where name=?"
+    #     cursor.execute(query, (self.price, self.name))
 
-        connection.commit()
-        connection.close()
+    #     connection.commit()
+    #     connection.close()
 
-    def remove(self):
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
+    def remove_from_db(self):
+
+        db.session.delete(self)
+        db.session.commit()
+
+        # connection = sqlite3.connect("data.db")
+        # cursor = connection.cursor()
         
-        query = "DELETE FROM items where name = ?"
-        cursor.execute(query, (self.name,))
+        # query = "DELETE FROM items where name = ?"
+        # cursor.execute(query, (self.name,))
 
-        connection.commit()
-        connection.close()
+        # connection.commit()
+        # connection.close()

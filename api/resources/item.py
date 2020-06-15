@@ -52,7 +52,7 @@ class Item(Resource):                             #create resource Item
         new_item = ItemModel(name, data["price"])
 
         try:
-            new_item.insert()
+            new_item.save_to_db()
         except:
             return{"message":"Error occur while inserting an item"}, 500
 
@@ -64,28 +64,23 @@ class Item(Resource):                             #create resource Item
             item = ItemModel.find_by_name(name)
             if item is None:
                 return {"message": "The item does not exist"}
-            item.remove()
+            item.remove_from_db()
         except:
             return{"message":"Error occur while removing an item"}, 500
         
-        return {"message":f"Item {name} deleted"}, 204
+        return {"message":"Item deleted"}, 204
 
     @jwt_required()
     def put(self, name): 
         data = Item.parser.parse_args()
 
         item = ItemModel.find_by_name(name)
-        updated_item = ItemModel(name, data["price"])
 
         if item is None: 
-            try:
-                updated_item.insert()
-            except:
-                return{"message":"Error occur while inserting an item"}, 500            
+            item = ItemModel(name, data["price"])           
         else:
-            try:
-                updated_item.update()
-            except:
-                return{"message":"Error occur while updating an item"}, 500
+            item.price = data["price"]
 
-        return updated_item.json()
+        item.save_to_db()
+
+        return item.json()

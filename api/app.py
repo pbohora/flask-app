@@ -6,10 +6,12 @@ from auth import authenticate, identity
 from resources.user import UserRegister
 from resources.item import Item, ItemList
 
-import config
+import configurations
 
 app = Flask(__name__)
-app.secret_key = config.secret
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.secret_key = configurations.secret
 api = Api(app)
 
 jwt = JWT(app, authenticate, identity)          #JWT creates a new end point /auth 
@@ -20,4 +22,6 @@ api.add_resource(Item, "/item/<string:name>")
 api.add_resource(UserRegister, "/signup")
 
 if __name__ == "__main__":
+    from db import db
+    db.init_app(app)
     app.run(port=3000, debug = True)
