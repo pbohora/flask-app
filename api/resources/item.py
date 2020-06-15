@@ -1,24 +1,25 @@
-import sqlite3
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required
 from models.item import ItemModel
 
 class ItemList(Resource):
     def get(self):
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
+        return {"items": [item.json() for item in ItemModel.query.all()]}
+
+        # connection = sqlite3.connect("data.db")
+        # cursor = connection.cursor()
         
-        query = "SELECT * FROM items"
-        result= cursor.execute(query)
-        items=[]
+        # query = "SELECT * FROM items"
+        # result= cursor.execute(query)
+        # items=[]
 
-        for row in result:
-            items.append({"name":row[0], "price":row[1]})
+        # for row in result:
+        #     items.append({"name":row[0], "price":row[1]})
     
-        connection.close()
-        print(items)
+        # connection.close()
+        # print(items)
 
-        return {"items":items}
+        # return {"items":items}
 
 
 class Item(Resource):                             #create resource Item
