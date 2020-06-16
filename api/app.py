@@ -5,6 +5,7 @@ from flask_jwt import JWT
 from auth import authenticate, identity
 from resources.user import UserRegister
 from resources.item import Item, ItemList
+from resources.category import Category, CategoryList
 
 import configurations
 
@@ -20,8 +21,9 @@ def create_tables():
 
 jwt = JWT(app, authenticate, identity)          #JWT creates a new end point /auth 
 
-
+api.add_resource(CategoryList, "/categories")
 api.add_resource(ItemList, "/items")
+api.add_resource(category, "/category/<string:name>")
 api.add_resource(Item, "/item/<string:name>")
 api.add_resource(UserRegister, "/signup")
 

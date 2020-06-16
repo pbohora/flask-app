@@ -31,6 +31,13 @@ class Item(Resource):                             #create resource Item
         help = "This is a required filed!!"
     )
 
+    parser.add_argument("category_id",                  
+        type = int,
+        required = True,
+        help = "Every item requires category id!"
+    )
+
+
     def get(self, name):
         try:
             item = ItemModel.find_by_name(name)
@@ -50,7 +57,7 @@ class Item(Resource):                             #create resource Item
         
         data = Item.parser.parse_args()
 
-        new_item = ItemModel(name, data["price"])
+        new_item = ItemModel(name, **data)
 
         try:
             new_item.save_to_db()
@@ -78,7 +85,7 @@ class Item(Resource):                             #create resource Item
         item = ItemModel.find_by_name(name)
 
         if item is None: 
-            item = ItemModel(name, data["price"])           
+            item = ItemModel(name, **data)           
         else:
             item.price = data["price"]
 
