@@ -19,9 +19,15 @@ class UserRegister(Resource):
 
     def post(self):
         data = UserRegister.parser.parse_args()
+        print(UserModel.find_by_username(data["username"]))
         
         if UserModel.find_by_username(data["username"]):
             return {"message": "User already exists with that username"}, 400
+
+        user = UserModel(**data)
+        user.save_to_db()
+
+        return {"message": "New user created"}, 201
 
         # connection = sqlite3.connect("data.db")
         # cursor = connection.cursor()
@@ -32,7 +38,3 @@ class UserRegister(Resource):
         # connection.commit()
         # connection.close()
 
-        user = UserModel(**data)
-        user.save_to_db
-
-        return {"message": "New user created"}, 201

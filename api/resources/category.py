@@ -10,7 +10,7 @@ class Category(Resource):
 
 
     def post(self,name):
-        category = CategoryModel.find_by_name(name):
+        category = CategoryModel.find_by_name(name)
         if category:
             return {"message":f"A category with name {name} already exists"}, 400
         
@@ -29,6 +29,6 @@ class Category(Resource):
         return {"message":"category deleted"}, 204
 
 
-class CategroyList(Resource):
+class CategoryList(Resource):
     def get(self):
         return {"categories" : [category.json() for category in CategoryModel.query.all()]}
